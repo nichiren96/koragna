@@ -37,12 +37,11 @@
     padding-right: 10px;
 }
 
-
 .typing::placeholder {
     /* Chrome, Firefox, Opera, Safari 10.1+ */
     color: #ff1744;
     opacity: 1;
-    /* Firefox */
+    
 }
 
 .typing::-ms-input-placeholder {
