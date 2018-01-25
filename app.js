@@ -56,14 +56,6 @@ io.sockets.on('connection', function (socket, pseudo) {
         socket.broadcast.emit('handle_keyup');
     });
 
-    /*
-    socket.on('disconnect', function (indexUser) {
-
-        onlineuser.splice(indexUser, 1);
-        socket.emit('update', onlineuser);
-        console.log('user disconnected');
-    });
-    */
 
  });
 
