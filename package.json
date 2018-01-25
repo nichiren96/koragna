@@ -1,0 +1,14 @@
+{
+    "name": "koragna",
+    "version": "0.1.0",
+    "dependencies": {
+        "cfenv": "^1.0.4",
+        "ejs": "^2.5.7",
+        "ent": "~0.1.0",
+        "express": "~3.3.4",
+        "nodemon": "^1.14.11",
+        "socket.io": "~1.2.1"
+    },
+    "author": "Roel Tombozafy <rtombozafy96@gmail.com>",
+    "description": "Un super Chat temps réel avec socket.io"
+}

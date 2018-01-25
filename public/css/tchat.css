@@ -1,0 +1,51 @@
+.chatColumn,
+.chatLine {
+    padding-left: 0;
+}
+
+.avatar {
+    padding-right: 0px;
+}
+
+.msg {
+    padding-right: 15px;
+}
+
+.chat {
+    height: 340px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.chatLine .well {
+    margin-top: 10px;
+    margin-right: 113px;
+}
+
+.messaging {
+    height: 80px;
+    width: 80px;
+    background-size: cover;
+}
+
+.chatMain {
+    margin-top: 50px;
+}
+
+.mysocial li {
+    display: inline;
+    padding-right: 10px;
+}
+
+
+.typing::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #ff1744;
+    opacity: 1;
+    /* Firefox */
+}
+
+.typing::-ms-input-placeholder {
+    color: #ff1744;
+    opacity: 1;
+}

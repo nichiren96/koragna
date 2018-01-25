@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Super Tchat temps réel !</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="css/tchat.css"/>
+
+</head>
+
+<body>
+
+    <nav class="purple darken-3">
+        <div class="nav-wrapper">
+            <a href="https://koragna.eu-gb.mybluemix.net/" class="brand-logo center">Koragna</a>
+        </div>
+    </nav>
+    <div class="container chatMain">
+        <div class="row ">
+            <div class="col s9">
+                <div class="chat">
+                    <div class="chatContent" id="zone_chat">
+
+                    </div>
+                </div>
+                <form method="post" id="formulaire_chat" class="col s12">
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input type="text" name="feedbak" id="feedback" disabled>
+                        </div>
+                        <div class="input-field col s8">
+                            <input type="text" name="message" id="message" placeholder="Votre message" required autofocus>
+                        </div>
+                        <div class="input-field col s2">
+                            <button type="button" onclick="alert('La reconnaissance vocale est indisponible')" class="btn btn-floating btn-large red accent-3">
+                                <i class="fa fa-microphone" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="input-field col s2">
+                            <button type="submit" class="btn btn-floating btn-large red accent-3 pulse">
+                                <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col s3">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Online</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="online">
+
+                    </tbody>
+                </table>
+
+            </div>
+            <input type="hidden" value="<%= host %>" id="host" />
+            <div id="notif_msg">
+                <audio id="new_msg_sound">
+                    <source src="sound/notif.ogg" type="audio/ogg">
+                    <source src="sound/notif.mp3" type="audio/mpeg">
+                    <source src="sound/notif.wav" type="audio/wav">
+                </audio>
+            </div>
+            <div id="notif_user">
+                <audio id="new_user_sound">
+                    <source src="sound/to-the-point.ogg" type="audio/ogg">
+                    <source src="sound/to-the-point.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="page-footer purple darken-3">
+        <div class="container">
+            <div class="row">
+                <div class="col l6 s12">
+                    <h5 class="white-text">A propos de ce projet</h5>
+                    <p class="grey-text text-lighten-4">Un simple tchat avec socket.io.</p>
+                </div>
+                <div class="col l4 offset-l2 s12">
+                    <h5 class="white-text">Réseaux sociaux</h5>
+                    <ul class="mysocial">
+                        <li>
+                            <a target="_blank" class="grey-text text-lighten-3 purple darken-2 btn btn-floating btn-large" href="https://www.facebook.com/roel.tombozafy">
+                                <i class="fa fa-facebook fa-lg" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a target="_blank" class="grey-text text-lighten-3 purple darken-2 btn btn-floating btn-large" href="https://twitter.com/nichiren96">
+                                <i class="fa fa-twitter fa-lg" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a target="_blank" class="grey-text text-lighten-3 purple darken-2 btn btn-floating btn-large" href="https://github.com/nichiren96">
+                                <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a target="_blank" class="grey-text text-lighten-3 purple darken-2 btn btn-floating btn-large" href="https://www.linkedin.com/in/roel-tombozafy-07959696">
+                                <i class="fa fa-linkedin fa-lg" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2018 Copyright
+                <a class="grey-text text-lighten-4 right" href="https://www.facebook.com/roel.tombozafy">by Roel Tombozafy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>      
+
+        // Connexion à socket.io
+        var socket = io.connect($('#host'));
+
+        // On demande le pseudo, on l'envoie au serveur et on l'affiche dans le titre
+        var pseudo = "";
+        do {
+            pseudo = prompt('Quel est votre pseudo ?');
+        } while (pseudo == "");
+
+        socket.emit('new_client', pseudo);
+        document.title = pseudo + ' - ' + document.title;
+
+        // Quand on reçoit un message, on l'insère dans la page
+        socket.on('message', function (data) {
+
+            document.getElementById('new_msg_sound').play();
+
+            Materialize.toast('nouveau message reçu', 3000);
+            insereMessage(data.pseudo, data.message)
+        });
+
+        // Quand un nouveau client se connecte, on affiche l'information
+        socket.on('new_client', function (pseudo) {
+            document.getElementById('new_user_sound').play();
+            Materialize.toast(pseudo + ' a rejoint le chat', 4000, 'rounded');
+        });
+
+        // Lorsqu'on envoie le formulaire, on transmet le message et on l'affiche sur la page
+        $('#formulaire_chat').submit(function (e) {
+            e.preventDefault();
+            var message = $('#message').val();
+            socket.emit('message', message); // Transmet le message aux autres
+            insereMessage(pseudo, message); // Affiche le message aussi sur notre page
+            $('#message').val('').focus(); // Vide la zone de Chat et remet le focus dessus
+            return false; // Permet de bloquer l'envoi "classique" du formulaire
+        });
+
+        // Quand un client enfonce une touche de son clavier
+        // on signale le serveur
+        $('#message').keydown(function () {
+            socket.emit('keydown');
+
+        });
+
+        $('#message').keyup(function () {
+            socket.emit('keyup');
+
+        });
+
+        // Gère la réponse du serveur suite à la récéption de "keydown"
+        socket.on('handle_keydown', function (pseudo) {
+            $('#feedback').attr('placeholder', pseudo + " est en train d'écrire");
+            $('#feedback').addClass('typing');
+
+        });
+
+        socket.on('handle_keyup', function () {
+            $('#feedback').attr('placeholder', "");
+
+        });
+
+        // On reçoit une demande de mise à jour de toute la liste
+        socket.on('update', function (onlineuser) {
+            updateOnlineUserList(onlineuser);
+        });
+
+        function updateOnlineUserList(list) {
+            $('#online').empty();
+            list.forEach(function (user, index) {
+
+                $('#online').append('<tr><td>' + index + '</td><td>' + user + '</td></tr>')
+
+            });
+        }
+
+        // Ajoute un message dans la page
+        function insereMessage(pseudo, message) {
+
+            $('#zone_chat').append(
+                '<div class="row msg">' +
+                '<div class="col s2 avatar">' +
+                '<span' +
+                '> <img class="circle responsive-img" src="http://fakeimg.pl/80x80/?text=' + pseudo + '" /></span>' +
+                '</div>' +
+                '<div class="col s10 chatLine">' +
+                '<div class="z-depth-3 card red accent-3"><div class="card-content white-text">' + message +
+                '</div></div>' +
+                '</div>' +
+                '</div>'
+            );
+
+
+        }
+    </script>
+</body>
+
+</html>
