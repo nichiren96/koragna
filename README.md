@@ -1,5 +1,5 @@
 # koragna
- Github repository for the chat "koragna" avalaible here  https://koragna.eu-gb.mybluemix.net/
+ koragna is a sample project built with socket.io. It is basic chat
 
 # requirements
 To run this app you need to install at least node version 8
